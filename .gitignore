@@ -1,0 +1,30 @@
+# binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+.bin/
+
+# test files
+*.test
+*.prof
+coverage.out
+coverage_no_mocks.out
+profile.cov
+
+# os files
+.DS_Store
+Thumbs.db
+
+# debug
+__debug_bin*
+
+# claude project files
+.claude/
+
+# goreleaser
+dist/
+
+# local secrets for compose.yaml
+.env

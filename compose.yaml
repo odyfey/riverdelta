@@ -1,0 +1,34 @@
+# Runs riverdelta against existing River databases.
+#
+#   cp config.example.yaml config.yaml   # then edit databases/instances
+#   echo 'PROD_DATABASE_URL=postgres://...' >> .env
+#   docker compose up -d --build
+#
+# Every ${VAR} referenced from config.yaml must be set in .env (or the shell
+# environment passed through below), otherwise startup fails.
+
+services:
+  riverdelta:
+    build:
+      context: .
+      args:
+        REVISION: ${REVISION:-dev}
+    # or use the released image instead of building:
+    # image: ghcr.io/odyfey/riverdelta:latest
+    restart: unless-stopped
+    ports:
+      - "${RIVERDELTA_PORT:-8080}:8080"
+    env_file:
+      - path: .env
+        required: false
+    volumes:
+      - ./config.yaml:/etc/riverdelta/config.yaml:ro
+      # SQLite: mount the directory, not the file (it needs -wal/-shm files
+      # next to it), writable by nobody, and use url: sqlite:/data/<file>
+      # - ./data:/data
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/healthz"]
+      interval: 30s
+      timeout: 3s
+      start_period: 5s
+      retries: 3

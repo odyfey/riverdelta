@@ -1,0 +1,76 @@
+{{- /* Styled only with riverui's own stylesheet, so every class must exist in
+it. Markup follows riverui's TopNav, QueueList and Badge. */ -}}
+{{- $badge := "inline-flex items-center gap-x-1.5 rounded-md px-1.5 py-0.5 text-sm/5 font-medium sm:text-xs/5 forced-colors:outline" -}}
+<!doctype html>
+<html lang="en" class="h-full">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>River instances</title>
+    <link rel="icon" href="{{.Icon}}" type="image/png" />
+    <script>
+      // Applies the theme chosen inside riverui, which keeps it in the same
+      // localStorage key on this origin, before the first paint.
+      (() => {
+        let theme = null;
+        try {
+          theme = localStorage.getItem("theme");
+        } catch {}
+        const system = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        const resolved = theme === "light" || theme === "dark" ? theme : system;
+        document.documentElement.classList.toggle("dark", resolved === "dark");
+        document.documentElement.style.colorScheme = resolved;
+      })();
+    </script>
+    <link rel="stylesheet" href="{{.Stylesheet}}" />
+  </head>
+  <body class="h-full bg-white dark:bg-slate-900">
+    <div class="sticky top-0 z-10 bg-white lg:mx-auto dark:border-slate-700 dark:bg-slate-900">
+      <div class="flex h-16 items-center gap-x-3 border-b px-4 shadow-xs sm:px-6 lg:px-8 lg:shadow-none dark:border-slate-800">
+        <img alt="" class="size-7" src="{{.Icon}}" />
+        <h1 class="inline text-base leading-6 font-semibold text-slate-900 dark:text-slate-100">Instances</h1>
+      </div>
+    </div>
+    <main class="mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="-mx-4 mt-8 sm:-mx-0">
+        <table class="min-w-full divide-y divide-slate-300 dark:divide-slate-700">
+          <thead>
+            <tr>
+              <th class="py-2.5 pr-3 pl-4 text-left text-sm font-semibold text-slate-900 sm:pl-0 dark:text-slate-100" scope="col">Instance</th>
+              <th class="hidden px-3 py-2.5 text-left text-sm font-semibold text-slate-900 md:table-cell dark:text-slate-100" scope="col">Path</th>
+              <th class="py-2.5 pr-4 pl-3 text-left text-sm font-semibold text-slate-900 sm:pr-0 dark:text-slate-100" scope="col">Status</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-200 bg-white dark:divide-slate-800 dark:bg-slate-900">
+            {{- range .Instances}}
+            <tr class="relative hover:bg-slate-50 dark:hover:bg-slate-800">
+              <td class="w-full max-w-0 py-2 pr-3 pl-4 text-sm font-medium text-slate-700 sm:pl-0 dark:text-slate-300">
+                <div class="flex gap-x-3">
+                  <span aria-hidden="true" class="flex size-6 shrink-0 items-center justify-center rounded-md text-xs font-bold text-white uppercase" style="background-color: {{if .Color}}{{.Color}}{{else}}#64748b{{end}}">{{initial .Label}}</span>
+                  <div class="min-w-0 flex-1">
+                    <a class="block truncate leading-6 text-slate-900 after:absolute after:inset-0 dark:text-slate-200" href="{{.Base}}/">{{.Label}}</a>
+                    <div class="mt-1 truncate font-mono font-normal md:hidden">{{.Base}}</div>
+                    {{- if .Warning}}
+                    <div class="mt-1 text-xs leading-5 font-normal text-amber-700 dark:text-amber-400">{{.Warning}}</div>
+                    {{- end}}
+                  </div>
+                </div>
+              </td>
+              <td class="hidden px-3 py-2 font-mono text-sm whitespace-nowrap text-slate-500 md:table-cell dark:text-slate-300">{{.Base}}</td>
+              <td class="py-2 pr-4 pl-3 text-sm whitespace-nowrap sm:pr-0">
+                {{- if not .Healthy}}
+                <span class="{{$badge}} bg-red-500/15 text-red-700 dark:bg-red-500/10 dark:text-red-400">Unreachable</span>
+                {{- else if .Warning}}
+                <span class="{{$badge}} bg-amber-400/20 text-amber-700 dark:bg-amber-400/10 dark:text-amber-400">Warning</span>
+                {{- else}}
+                <span class="{{$badge}} bg-green-500/15 text-green-700 dark:bg-green-500/10 dark:text-green-400">Healthy</span>
+                {{- end}}
+              </td>
+            </tr>
+            {{- end}}
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </body>
+</html>

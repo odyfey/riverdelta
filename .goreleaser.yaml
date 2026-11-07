@@ -1,0 +1,45 @@
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+#
+# Builds and pushes the image from Dockerfile; the context has no sources
+# besides extra_files.
+version: 2
+
+project_name: riverdelta
+
+# images only: the Dockerfile builds the binary with make build
+builds:
+  - skip: true
+
+dockers_v2:
+  - dockerfile: Dockerfile
+    extra_files:
+      - go.mod
+      - go.sum
+      - Makefile
+      - app
+    build_args:
+      REVISION: "{{ .Tag }}-{{ .ShortCommit }}"
+    images:
+      - ghcr.io/odyfey/riverdelta
+    tags:
+      - "{{ .Version }}"
+      - "{{ if not .Prerelease }}latest{{ end }}"
+    platforms:
+      - linux/amd64
+      - linux/arm64
+    labels:
+      org.opencontainers.image.title: "{{ .ProjectName }}"
+      org.opencontainers.image.description: One River UI for many River databases and schemas
+      org.opencontainers.image.source: "{{ .GitURL }}"
+      org.opencontainers.image.licenses: MPL-2.0
+      org.opencontainers.image.version: "{{ .Version }}"
+      org.opencontainers.image.revision: "{{ .FullCommit }}"
+      org.opencontainers.image.created: "{{ .Date }}"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore:"

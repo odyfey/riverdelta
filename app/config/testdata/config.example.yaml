@@ -1,0 +1,39 @@
+# riverdelta config: one River UI for many River databases and schemas.
+#
+# Every instance is served under /<name>/. Never put secrets here: reference
+# them as ${VAR} in url and password, so the file holds no credentials and is
+# safe to commit or mount as a ConfigMap.
+
+listen: ":8080"
+
+# optional; health checks (/healthz, /<name>/api/health-checks/*) stay open
+basic_auth:
+  username: admin
+  password: ${RIVERDELTA_PASSWORD}
+
+# url picks the engine: sqlite:<path> or file:<path> is SQLite, anything else
+# is Postgres. one pool per database, shared by every instance (schema) on it.
+# total connections = sum of max_conns (default 3, 1 for SQLite).
+# a SQLite file holds exactly one instance, without a schema.
+# instances are listed in file order: databases first, then their instances.
+#
+# name: url path segment, ^[a-z0-9-]+$, unique across databases (not api, healthz)
+# schema: postgres schema with River tables; empty uses the search_path
+# label: shown in the switcher and on the landing page (defaults to name)
+# color: css color name or hex, marks the instance in the switcher
+databases:
+  shared:
+    url: ${SHARED_DATABASE_URL}
+    max_conns: 3
+    instances:
+    - { name: tenant-a, schema: tenant_a, label: "Tenant A" }
+    - { name: tenant-b, schema: tenant_b, label: "Tenant B", color: "#2563eb" }
+  prod:
+    url: ${PROD_DATABASE_URL}
+    max_conns: 3
+    instances:
+    - { name: prod, schema: "", label: "Prod", color: red }
+  # local:
+  #   url: sqlite:/data/app.sqlite3
+  #   instances:
+  #   - { name: local, label: "Local" }
