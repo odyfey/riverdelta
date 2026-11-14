@@ -8,7 +8,7 @@ require (
 	github.com/riverqueue/river/riverdriver v0.51.1
 	github.com/riverqueue/river/riverdriver/riverpgxv5 v0.51.1
 	github.com/riverqueue/river/riverdriver/riversqlite v0.51.1
-	github.com/riverqueue/river/rivertype v0.51.1
+	github.com/riverqueue/river/rivertype v0.51.2
 	github.com/samber/slog-http v1.12.1
 	github.com/stretchr/testify v1.12.1
 	github.com/testcontainers/testcontainers-go v0.45.0
